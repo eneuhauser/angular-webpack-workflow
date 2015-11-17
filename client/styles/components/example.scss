@@ -1,0 +1,8 @@
+@import 'config/colors';
+@import 'config/media_queries';
+
+html {
+	p {
+		color: $blue;
+	}
+}

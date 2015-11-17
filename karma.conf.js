@@ -1,39 +1,49 @@
-// Reference: http://karma-runner.github.io/0.12/config/configuration-file.html
-module.exports = function karmaConfig (config) {
+/** @see http://karma-runner.github.io/0.12/config/configuration-file.html */
+module.exports = function(config) {
+  
   config.set({
+    
+    // base path that will be used to resolve all patterns (eg. files, exclude)
+    //basePath: basePath,
+    
+    /** @see https://npmjs.org/browse/keyword/karma-adapter */
     frameworks: [
-      // Reference: https://github.com/karma-runner/karma-jasmine
-      // Set framework to jasmine
+      /** @see https://github.com/karma-runner/karma-jasmine */
       'jasmine'
     ],
 
+    /** @see https://npmjs.org/browse/keyword/karma-reporter */
     reporters: [
-      // Reference: https://github.com/mlex/karma-spec-reporter
-      // Set reporter to print detailed results to console
+      
+      /**
+       * Set reporter to print detailed results to console.
+       * @see https://github.com/mlex/karma-spec-reporter
+       */
       'spec',
 
-      // Reference: https://github.com/karma-runner/karma-coverage
-      // Output code coverage files
+      /**
+       * Output code coverage files.
+       * @see https://github.com/karma-runner/karma-coverage
+       */
       'coverage'
     ],
 
     files: [
       // Grab all files in the app folder that contain .test.
-      'src/tests.webpack.js'
+      'config/test.config.js'
     ],
 
     preprocessors: {
       // Reference: http://webpack.github.io/docs/testing.html
       // Reference: https://github.com/webpack/karma-webpack
       // Convert files with webpack and load sourcemaps
-      'src/tests.webpack.js': ['webpack', 'sourcemap']
+      'config/test.config.js': ['webpack', 'sourcemap']
     },
 
-    browsers: [
-      // Run tests using PhantomJS
-      'PhantomJS'
-    ],
+    /** @see https://npmjs.org/browse/keyword/karma-launcher */
+    browsers: [ 'PhantomJS' ],
 
+    autoWatch: false,
     singleRun: true,
 
     // Configure code coverage reporter
@@ -42,7 +52,7 @@ module.exports = function karmaConfig (config) {
       type: 'html'
     },
 
-    webpack: require('./webpack.test'),
+    webpack: require('./config/webpack/webpack.test'),
 
     // Hide webpack build information from output
     webpackMiddleware: {
