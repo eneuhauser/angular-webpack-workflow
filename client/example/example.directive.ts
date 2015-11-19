@@ -1,26 +1,28 @@
 import * as angular from 'angular';
 
-import example from './example/example.directive.ts';
-import template from './example/example.directive.html';
+import './example.scss';
+import template from './example.directive.html';
 
-angular.module('app', [
-  example
-]);//.directive('exampleDirective', exampleDirective);
+export default angular.module('app.example', [])
+  .directive('exampleDirective', exampleDirective)
+  .name;
 
+/* ngInject */
 function exampleDirective() {
   const directive = {
     restrict: 'AE',
     scope: {},
     template: template,
-    controllorAs: 'vm',
+    controllerAs: 'vm',
     controller: exampleController
   };
 
   return directive;
 }
 
+/* ngInject */
 function exampleController() {
   const vm = this;
+
   vm.someValue = true;
 }
-

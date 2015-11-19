@@ -24,14 +24,14 @@ const babelLoader = 'babel-loader?presets[]=es2015&presets[]=stage-1';
  * @param options can be expressed as either ...rest or individual arguments.
  */
 module.exports = function makeWebPackConfig(/* options */) {
-  
+
   const opts = assign({
     build: false,
     test: false,
     typescript: true,
     baseDir: path.normalize(__dirname + '/../..')
   }, Array.prototype.slice.call(arguments, 0));
-  
+
   return {
     context: opts.baseDir,
     entry: entry(opts),
@@ -54,15 +54,16 @@ module.exports = function makeWebPackConfig(/* options */) {
 function entry(opts) {
   // Karma will set this during test build
   if(opts.test) { return {}; }
-  
-  return './client/app.ts';
+
+  const ext = opts.typescript ? '.ts' : '.js';
+  return './client/app' + ext;
 }
 
 /** @see http://webpack.github.io/docs/configuration.html#output */
 function output(opts) {
   // Karma will set this during test build
   if(opts.test) { return {}; }
-  
+
   return {
     path: path.resolve(opts.baseDir, 'dist'),
     publicPath: '/assets/',
@@ -73,7 +74,7 @@ function output(opts) {
 /** @see http://webpack.github.io/docs/configuration.html#module-loaders */
 function loaders(opts) {
   const loaders = [];
-  
+
   if(opts.typescript) {
     /**
      * Compiles typescript files into ES6, then compiles ES6 to ES5 with Babel.
@@ -96,7 +97,7 @@ function loaders(opts) {
     exclude: /node_modules/,
     loader: babelLoader
   });
-  
+
   /**
    * Copy png, jpg, jpeg, gif, svg, woff, woff2, ttf, eot files to output
    * Rename the file using the asset hash
@@ -108,7 +109,7 @@ function loaders(opts) {
     test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/,
     loader: 'file'
   });
-  
+
   /**
    * Allow loading html through js.
    * @see https://github.com/webpack/raw-loader
@@ -132,14 +133,14 @@ function loaders(opts) {
       ].join('!'))
     });
   }
-  
+
   return loaders;
 }
 
 /** @see http://webpack.github.io/docs/configuration.html#module-preloaders-module-postloaders */
 function preLoaders(opts) {
   const preloaders = [];
-  
+
   if(opts.test) {
     /**
      * ISPARTA LOADER
@@ -148,10 +149,10 @@ function preLoaders(opts) {
      * @see https://github.com/ColCh/isparta-instrumenter-loader
      */
     preloaders.push({
-      test: /\.js$/,
+      test: opts.typescript ? /\.[jt]sx?$/ : /\.jsx?$/,
       exclude: [
         /node_modules/,
-        /\.test\.[jt]sx?$/
+        opts.typescript ? /\.test\.[jt]sx?$/ : /\.test\.jsx?$/
       ],
       loader: 'isparta-instrumenter'
     });
@@ -162,12 +163,12 @@ function preLoaders(opts) {
 
 /** @see http://webpack.github.io/docs/configuration.html#resolve */
 function resolve(opts) {
-  const extensions = ['', '.webpack.js', '.web.js', '.js', '.scss'];
+  const extensions = ['', '.webpack.js', '.web.js', '.js', '.scss', '.html'];
   if(opts.typescript) {
     extensions.push('.ts');
     extensions.push('.tsx');
   }
-  
+
   return {
     extensions: extensions
   };
@@ -176,7 +177,7 @@ function resolve(opts) {
 /** @see http://webpack.github.io/docs/configuration.html#devtool */
 function devtool(opts) {
   if(opts.test) { return 'inline-source-map'; }
-  
+
   return opts.build ? 'source-map' : 'eval';
 }
 
@@ -219,7 +220,7 @@ function plugins(opts) {
   }));
 
   if(opts.build) {
-    
+
     /**
      * Identifies common modules and put them into a commons chunk
      * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
@@ -231,19 +232,19 @@ function plugins(opts) {
      * @see http://webpack.github.io/docs/list-of-plugins.html#noerrorsplugin
      */
     plugins.push(new webpack.NoErrorsPlugin());
-    
+
     /**
      * Dedupe modules in the output
      * @see http://webpack.github.io/docs/list-of-plugins.html#dedupeplugin
      */
     plugins.push(new webpack.optimize.DedupePlugin());
-    
+
     /**
      * Minify all javascript, switch loaders to minimizing mode
      * @see http://webpack.github.io/docs/list-of-plugins.html#uglifyjsplugin
      */
     plugins.push(new webpack.optimize.UglifyJsPlugin());
-    
+
   }
 
   /**
@@ -253,7 +254,7 @@ function plugins(opts) {
     * @see http://webpack.github.io/docs/list-of-plugins.html#occurenceorderplugin
     */
   plugins.push(new webpack.optimize.OccurenceOrderPlugin());
-  
+
   return plugins;
 }
 
@@ -268,7 +269,7 @@ function postcss(opts) {
     autoprefixer({
       browsers: ['last 2 versions']
     })
-    
+
   ];
 }
 
@@ -291,10 +292,10 @@ function assign(/*target, ...sources*/) {
   }
   sources.forEach(function(source) {
     if(source === null || typeof source !== 'object') { return true; }
-    
+
     Object.keys(source).forEach(function(prop) {
       if(!source.hasOwnProperty(prop)) { return true; }
-      
+
       const value = source[prop];
       if(Array.isArray(value)) {
         target[prop] = Array.prototype.slice.call(value, 0);

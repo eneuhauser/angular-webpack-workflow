@@ -1,8 +1,8 @@
 @import 'config/colors';
 @import 'config/media_queries';
 
-html {
-	p {
+.example {
+	&__title {
 		color: $blue;
 	}
 }
