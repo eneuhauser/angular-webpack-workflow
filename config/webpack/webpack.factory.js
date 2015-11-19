@@ -163,7 +163,7 @@ function preLoaders(opts) {
 
 /** @see http://webpack.github.io/docs/configuration.html#resolve */
 function resolve(opts) {
-  const extensions = ['', '.webpack.js', '.web.js', '.js', '.scss', '.html'];
+  const extensions = ['', '.webpack.js', '.web.js', '.js', '.scss'];
   if(opts.typescript) {
     extensions.push('.ts');
     extensions.push('.tsx');
