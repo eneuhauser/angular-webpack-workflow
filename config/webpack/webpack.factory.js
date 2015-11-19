@@ -56,7 +56,7 @@ function entry(opts) {
   if(opts.test) { return {}; }
 
   const ext = opts.typescript ? '.ts' : '.js';
-  return './client/app' + ext;
+  return [ './client/styles/app.scss', './client/app' + ext ];
 }
 
 /** @see http://webpack.github.io/docs/configuration.html#output */
@@ -226,6 +226,12 @@ function plugins(opts) {
      * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
      */
     plugins.push(new webpack.optimize.CommonsChunkPlugin("commons.js"));
+
+    /**
+     * Identifies common modules and put them into a commons chunk
+     * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
+     */
+    plugins.push(new webpack.optimize.CommonsChunkPlugin("commons.css"));
 
     /**
      * Only emit files when there are no errors
