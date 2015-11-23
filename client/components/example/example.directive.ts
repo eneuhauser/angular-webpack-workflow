@@ -1,18 +1,19 @@
 import * as angular from 'angular';
 
 import './example.scss';
-import template from './example.directive.html';
+
+// This line is needed to 'require' HTML in TypeScript
+declare function require(string): string;
 
 export default angular.module('app.exampleDirective', [])
   .directive('exampleDirective', exampleDirective)
   .name;
 
-/* ngInject */
 function exampleDirective() {
   const directive = {
     restrict: 'AE',
     scope: {},
-    template: template,
+    templateUrl: require('./example.directive.html'),
     controllerAs: 'vm',
     controller: exampleController
   };
@@ -20,7 +21,6 @@ function exampleDirective() {
   return directive;
 }
 
-/* ngInject */
 function exampleController() {
   const vm = this;
 

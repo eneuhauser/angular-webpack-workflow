@@ -68,9 +68,10 @@ function output(opts) {
   if(opts.test) { return {}; }
 
   return {
-    path: path.resolve(opts.baseDir, 'dist'),
+    path: path.resolve(opts.baseDir, 'dist/assets'),
     publicPath: '/assets/',
-    filename: opts.build ? '[name].[hash].js' : '[name].bundle.js'
+    //filename: opts.build ? '[name].[hash].js' : '[name].bundle.js'
+    filename: '[name].bundle.js'
   };
 }
 
@@ -97,7 +98,7 @@ function loaders(opts) {
    */
   loaders.push({
     test: /\.js$/,
-    exclude: /node_modules/,
+    exclude: /(node_modules|bower_components)/,
     loader: babelLoader
   });
 
@@ -115,11 +116,15 @@ function loaders(opts) {
 
   /**
    * Allow loading html through js.
-   * @see https://github.com/webpack/raw-loader
+   * @see https://github.com/webpack/html-loader
+   * @see https://github.com/WearyMonkey/ngtemplate-loader
    */
   loaders.push({
     test: /\.html$/,
-    loader: 'raw'
+    exclude: /(node_modules|bower_components|public)/,
+    // TBD Potentially need to test if Windows and adjust the path separators.
+    // @see https://github.com/WearyMonkey/ngtemplate-loader#path-separators-or-using-on-windows
+    loader: 'ngtemplate?relativeTo='+opts.baseDir+'!html'
   });
 
   if(!opts.test) {
@@ -144,6 +149,17 @@ function loaders(opts) {
 function preLoaders(opts) {
   const preloaders = [];
 
+  /**
+   * Used with ng-template loader to preload template to be referenced in directives.
+   * @see https://github.com/deepsweet/baggage-loader
+   * @see https://github.com/WearyMonkey/ngtemplate-loader#baggage-example
+   */
+  preloaders.push({
+    test: /\.[tj]sx?$/,
+    exclude: /(node_modules|bower_components|public)/,
+    loader: 'baggage?[file].html&[file].scss'
+  });
+
   if(opts.test) {
     /**
      * ISPARTA LOADER
@@ -154,7 +170,7 @@ function preLoaders(opts) {
     preloaders.push({
       test: opts.typescript ? /\.[jt]sx?$/ : /\.jsx?$/,
       exclude: [
-        /node_modules/,
+        /(node_modules|bower_components|public)/,
         opts.typescript ? /\.test\.[jt]sx?$/ : /\.test\.jsx?$/
       ],
       loader: 'isparta-instrumenter'
@@ -225,7 +241,7 @@ function plugins(opts) {
      * Identifies common modules and put them into a commons chunk
      * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
      */
-    plugins.push(new webpack.optimize.CommonsChunkPlugin("commons.js"));
+    //plugins.push(new webpack.optimize.CommonsChunkPlugin("commons.js"));
 
     /**
      * Identifies common modules and put them into a commons chunk
@@ -249,7 +265,11 @@ function plugins(opts) {
      * Minify all javascript, switch loaders to minimizing mode
      * @see http://webpack.github.io/docs/list-of-plugins.html#uglifyjsplugin
      */
-    plugins.push(new webpack.optimize.UglifyJsPlugin());
+    plugins.push(new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    }));
 
   }
 
