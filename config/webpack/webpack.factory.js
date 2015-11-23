@@ -29,7 +29,10 @@ module.exports = function makeWebPackConfig(/* options */) {
     build: false,
     test: false,
     typescript: true,
-    baseDir: path.normalize(__dirname + '/../..')
+    baseDir: path.normalize(__dirname + '/../..'),
+    server: {
+      port: '4200'
+    }
   }, Array.prototype.slice.call(arguments, 0));
 
   return {
@@ -183,28 +186,25 @@ function devtool(opts) {
 
 /** @see http://webpack.github.io/docs/configuration.html#devserver */
 function devServer(opts) {
-  // FIXME Need configurations
-  return {
+  const server = {
+    port: opts.server.port,
     contentBase: './public',
     stats: {
       modules: false,
       cached: false,
       colors: true,
       chunk: false
-    },
-    proxy: {
-      '/api*': {
-        target: 'http://localhost:8080/api',
-        secure: false,
-        bypass: function(req, res, proxyOptions) {
-          if (req.headers.accept.indexOf('html') !== -1) {
-            console.log('Skipping proxy for browser request.');
-            return '/index.html';
-          }
-        },
-      },
-    },
+    }
   };
+
+  if(isObject(opts.server.proxy)) {
+    server.proxy = {};
+    server.proxy[opts.server.proxy.path] = {
+      target: opts.server.proxy,
+      secure: false
+    };
+  }
+  return server;
 }
 
 /** @see http://webpack.github.io/docs/configuration.html#plugins */
@@ -297,7 +297,7 @@ function assign(/*target, ...sources*/) {
     sources = sources[0];
   }
   sources.forEach(function(source) {
-    if(source === null || typeof source !== 'object') { return true; }
+    if(!isObject(source)) { return true; }
 
     Object.keys(source).forEach(function(prop) {
       if(!source.hasOwnProperty(prop)) { return true; }
@@ -305,8 +305,8 @@ function assign(/*target, ...sources*/) {
       const value = source[prop];
       if(Array.isArray(value)) {
         target[prop] = Array.prototype.slice.call(value, 0);
-      } else if(typeof value === 'object') {
-        if(typeof target[prop] !== 'object') {
+      } else if(isObject(value)) {
+        if(!isObject(target[prop])) {
           target[prop] = {};
         }
         assign(target[prop], value);
@@ -316,4 +316,8 @@ function assign(/*target, ...sources*/) {
     });
   });
   return target;
+}
+
+function isObject(value) {
+  return value !== null && typeof value === 'object';
 }
