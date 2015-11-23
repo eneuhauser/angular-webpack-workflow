@@ -3,7 +3,7 @@ import * as angular from 'angular';
 import './example.scss';
 import template from './example.directive.html';
 
-export default angular.module('app.example', [])
+export default angular.module('app.exampleDirective', [])
   .directive('exampleDirective', exampleDirective)
   .name;
 
