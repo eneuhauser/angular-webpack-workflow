@@ -8,9 +8,12 @@ const path = require('path');
 // NPM
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
+const glob = require('glob');
 
 // Webpack Plugins
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+const Clean = require('clean-webpack-plugin');
 
 /**
  * Settings for the babel-loader.
@@ -18,6 +21,14 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
  * @see https://babeljs.io/docs/plugins/#presets
  */
 const babelLoader = 'babel-loader?presets[]=es2015&presets[]=stage-1';
+
+/**
+ * Regex used to indicate the libraries. Excludes:
+ * * node_modules - modules loaded through npm
+ * * bower_component - modules loaded through bower
+ * * public - static files added to the project
+ */
+const libraries = /(node_modules|bower_components|public)/;
 
 /**
  * Function to take options to build the webpack configuration.
@@ -30,6 +41,10 @@ module.exports = function makeWebPackConfig(/* options */) {
     test: false,
     typescript: true,
     baseDir: path.normalize(__dirname + '/../..'),
+    dist: {
+      path: './dist',
+      assets: './dist/assets'
+    },
     server: {
       port: '4200'
     }
@@ -53,13 +68,24 @@ module.exports = function makeWebPackConfig(/* options */) {
 };
 
 
-/** @see http://webpack.github.io/docs/configuration.html#entry */
+/**
+ * @see http://webpack.github.io/docs/configuration.html#entry
+ * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
+ */
 function entry(opts) {
   // Karma will set this during test build
   if(opts.test) { return {}; }
 
-  const ext = opts.typescript ? '.ts' : '.js';
-  return [ './client/styles/app.scss', './client/app' + ext ];
+  const ext = opts.typescript ? '.ts' : '.j';
+  //return [ './client/styles/app.scss', './client/app' + ext ];
+  return {
+    // This is named commons for the web-dev-server
+    commons: [ './client/styles/app.scss', './client/app' + ext ],
+    // FIXME This is not ideal, but a way to copy all files in /public to /dist.
+    // Used in conjunction with a file-loader to move the files. Also, all other
+    // loaders need to exclude /public files.
+    assets: glob.sync(opts.baseDir + '/public/**/*.*')
+  };
 }
 
 /** @see http://webpack.github.io/docs/configuration.html#output */
@@ -68,10 +94,10 @@ function output(opts) {
   if(opts.test) { return {}; }
 
   return {
-    path: path.resolve(opts.baseDir, 'dist/assets'),
+    path: path.resolve(opts.baseDir, opts.dist.assets),
     publicPath: '/assets/',
     //filename: opts.build ? '[name].[hash].js' : '[name].bundle.js'
-    filename: '[name].bundle.js'
+    filename: '[name].js'
   };
 }
 
@@ -87,7 +113,7 @@ function loaders(opts) {
      */
     loaders.push({
       test: /\.tsx?$/,
-      exclude: /(node_modules|bower_components)/,
+      exclude: libraries,
       loaders: [babelLoader, 'ts-loader']
     });
   }
@@ -98,20 +124,35 @@ function loaders(opts) {
    */
   loaders.push({
     test: /\.js$/,
-    exclude: /(node_modules|bower_components)/,
+    exclude: libraries,
     loader: babelLoader
   });
 
   /**
-   * Copy png, jpg, jpeg, gif, svg, woff, woff2, ttf, eot files to output
+   * Copy svg, woff, woff2, ttf, eot files to output
    * Rename the file using the asset hash
    * Pass along the updated reference to your code
    * You can add here any file extension you want to get copied to your output
    * @see https://github.com/webpack/file-loader
    */
   loaders.push({
-    test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/,
+    test: /\.(svg|woff|woff2|ttf|eot)$/,
+    exclude: libraries,
     loader: 'file'
+  });
+
+  /**
+   * Either copy png, jpg, jpeg, gif files to output or convert to data. If the
+   * file is less than 8k, it will convert to data; otherwise, it will copy,
+   * rename the file using the asset hash, and pass along the updated reference
+   * to your code.
+   * You can add here any file extension you want to get copied to your output
+   * @see https://github.com/webpack/url-loader
+   */
+  loaders.push({
+    test: /\.(png|jpg|jpeg|gif)$/,
+    exclude: libraries,
+    loader: 'url?limit=8192'
   });
 
   /**
@@ -121,10 +162,21 @@ function loaders(opts) {
    */
   loaders.push({
     test: /\.html$/,
-    exclude: /(node_modules|bower_components|public)/,
+    exclude: libraries,
     // TBD Potentially need to test if Windows and adjust the path separators.
     // @see https://github.com/WearyMonkey/ngtemplate-loader#path-separators-or-using-on-windows
     loader: 'ngtemplate?relativeTo='+opts.baseDir+'!html'
+  });
+
+  /**
+   * Pulls all files in the /public folder and puts it into the dist folder.
+   * This is used in conjunction with the 'assets' entry.
+   * @see https://github.com/webpack/file-loader
+   */
+  loaders.push({
+    test: /public\/.*/,
+    exclude: /(node_modules|bower_components|client)/,
+    loader: 'file?name=../[path]/[name].[ext]&context=./public'
   });
 
   if(!opts.test) {
@@ -156,7 +208,7 @@ function preLoaders(opts) {
    */
   preloaders.push({
     test: /\.[tj]sx?$/,
-    exclude: /(node_modules|bower_components|public)/,
+    exclude: libraries,
     loader: 'baggage?[file].html&[file].scss'
   });
 
@@ -170,7 +222,7 @@ function preLoaders(opts) {
     preloaders.push({
       test: opts.typescript ? /\.[jt]sx?$/ : /\.jsx?$/,
       exclude: [
-        /(node_modules|bower_components|public)/,
+        libraries,
         opts.typescript ? /\.test\.[jt]sx?$/ : /\.test\.jsx?$/
       ],
       loader: 'isparta-instrumenter'
@@ -238,16 +290,16 @@ function plugins(opts) {
   if(opts.build) {
 
     /**
-     * Identifies common modules and put them into a commons chunk
-     * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
+     * Cleans the dist folder before building.
+     * @see https://github.com/johnagan/clean-webpack-plugin
      */
-    //plugins.push(new webpack.optimize.CommonsChunkPlugin("commons.js"));
+    plugins.push(new Clean([ opts.dist.path ], opts.baseDir));
 
     /**
      * Identifies common modules and put them into a commons chunk
      * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
      */
-    plugins.push(new webpack.optimize.CommonsChunkPlugin("commons.css"));
+    plugins.push(new CommonsChunkPlugin('commons', 'commons.js'));
 
     /**
      * Only emit files when there are no errors
