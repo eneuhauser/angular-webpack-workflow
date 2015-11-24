@@ -1,6 +1,8 @@
 import * as angular from 'angular';
-
 import './example.scss';
+
+// This needs to be defined to enable using 'require' in TypeScript
+declare function require(string): string;
 
 export default angular.module('app.exampleDirective', [])
   .directive('exampleDirective', exampleDirective)
@@ -23,6 +25,3 @@ function exampleController() {
 
   vm.someValue = true;
 }
-
-// This needs to be defined to enable using 'require' in TypeScript
-declare function require(string): string;
