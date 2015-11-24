@@ -4,6 +4,9 @@
   },
   "exclude": [
     "node_modules",
+    "bower_components",
     "dist"
-  ]
+  ],
+  "rootDir": "client/",
+  "moduleResolution": "node"
 }
