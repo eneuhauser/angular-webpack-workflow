@@ -27,12 +27,16 @@ $ cd my_app
 $ npm install
 ```
 
+### Recommendation
+
+The install installs everything for development, but you may want to 
+
 ## Scripts
 
 All scripts are run with `npm run [script]`, for example: `npm run test`.
 
-* `build` - generate a minified build to dist folder
-* `dev` - start development server, try it by opening `http://localhost:8080/`
+* `build` - performs installs and generates a minified build to `/dist` folder.
+* `serve` - starts development server, try it by opening [http://localhost:4200/]()
 * `test` - run all tests
 * `test:live` - continuously run unit tests watching for changes
 
