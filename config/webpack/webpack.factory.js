@@ -114,7 +114,7 @@ function loaders(opts) {
     loaders.push({
       test: /\.tsx?$/,
       exclude: libraries,
-      loaders: [babelLoader, 'ts-loader']
+      loaders: ['ng-annotate', babelLoader, 'ts-loader']
     });
   }
 
@@ -125,7 +125,7 @@ function loaders(opts) {
   loaders.push({
     test: /\.js$/,
     exclude: libraries,
-    loader: babelLoader
+    loaders: ['ng-annotate', babelLoader]
   });
 
   /**
