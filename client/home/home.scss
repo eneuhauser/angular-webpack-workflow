@@ -1,0 +1,7 @@
+@import '../styles/config/colors';
+
+.home {
+    &__title {
+        color: $blue;
+    }
+}
