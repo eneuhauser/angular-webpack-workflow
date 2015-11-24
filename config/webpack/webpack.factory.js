@@ -76,7 +76,7 @@ function entry(opts) {
   // Karma will set this during test build
   if(opts.test) { return {}; }
 
-  const ext = opts.typescript ? '.ts' : '.j';
+  const ext = opts.typescript ? '.ts' : '.js';
   //return [ './client/styles/app.scss', './client/app' + ext ];
   return {
     // This is named commons for the web-dev-server
