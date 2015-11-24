@@ -20,6 +20,5 @@ function config($routeProvider) {
     controllerAs: 'home'
   });
 }
-//config.$inject = [ '$routeProvider' ];
 
 export default homeModule.name;

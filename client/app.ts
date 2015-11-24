@@ -10,8 +10,7 @@ angular.module('app', [
   example
 ]).config(config);
 
-
+/* @ngInject */
 function config($routeProvider) {
   $routeProvider.otherwise({ redirectTo: '/' });
 }
-config.$inject = [ '$routeProvider' ];

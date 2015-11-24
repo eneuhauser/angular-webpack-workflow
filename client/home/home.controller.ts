@@ -5,6 +5,5 @@ function Controller() {
     name: 'World'
   };
 }
-Controller.$inject = [];
 
 export default Controller;
