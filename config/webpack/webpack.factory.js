@@ -16,13 +16,6 @@ const CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 const Clean = require('clean-webpack-plugin');
 
 /**
- * Settings for the babel-loader.
- * @see https://github.com/babel/babel-loader
- * @see https://babeljs.io/docs/plugins/#presets
- */
-const babelLoader = 'babel-loader?presets[]=es2015&presets[]=stage-1';
-
-/**
  * Regex used to indicate the libraries. Excludes:
  * * node_modules - modules loaded through npm
  * * bower_component - modules loaded through bower
@@ -114,7 +107,7 @@ function loaders(opts) {
     loaders.push({
       test: /\.tsx?$/,
       exclude: libraries,
-      loaders: ['ng-annotate', babelLoader, 'ts-loader']
+      loaders: ['ng-annotate', 'babel', 'ts-loader']
     });
   }
 
@@ -125,7 +118,7 @@ function loaders(opts) {
   loaders.push({
     test: /\.js$/,
     exclude: libraries,
-    loaders: ['ng-annotate', babelLoader]
+    loaders: ['ng-annotate', 'babel']
   });
 
   /**
