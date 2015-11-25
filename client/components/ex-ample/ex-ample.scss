@@ -1,0 +1,8 @@
+@import '../../styles/config/colors';
+@import '../../styles/config/media_queries';
+
+.ex-ample {
+	&__title {
+		color: $blue;
+	}
+}
