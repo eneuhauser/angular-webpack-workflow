@@ -207,17 +207,19 @@ function preLoaders(opts) {
     /**
      * ISPARTA LOADER
      * Instrument JS files with Isparta for subsequent code coverage reporting
-     * Skips node_modules and files that end with .test.js
+     * Skips node_modules and files that end with .spec.js
      * @see https://github.com/ColCh/isparta-instrumenter-loader
      */
+    /* FIXME This is not working
     preloaders.push({
       test: opts.typescript ? /\.[jt]sx?$/ : /\.jsx?$/,
       exclude: [
         libraries,
-        opts.typescript ? /\.test\.[jt]sx?$/ : /\.test\.jsx?$/
+        opts.typescript ? /\.spec\.[jt]sx?$/ : /\.spec\.jsx?$/
       ],
-      loader: 'isparta-instrumenter'
+      loader: opts.typescript ? 'isparta-instrumenter!babel!ts-loader' : 'isparta-instrumenter!babel'
     });
+    */
   }
 
   return preloaders;

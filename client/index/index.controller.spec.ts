@@ -1,17 +1,15 @@
-import * as angular from 'angular';
-import 'angular-mocks/angular-mocks';
 import IndexModule from './index.module';
 
 describe('index.controller', function() {
-  var $rootScope, $controller, $q, ctrl;
+  var ctrl;
 
-  beforeEach(angular.mock.module('app.index'));
+  beforeEach(angular.mock.module(IndexModule));
 
-  beforeEach(angular.mock.inject(function(_$controller_, _$q_, _$rootScope_) {
-    $rootScope = _$rootScope_;
-    $q = _$q_;
-    $controller = _$controller_;
-    ctrl = $controller('IndexController', {});
+  beforeEach(angular.mock.inject(function($rootScope, $controller) {
+    var scope = $rootScope.$new();
+    ctrl = $controller('Index', {
+      $scope: scope
+    });
   }));
 
   it('can run', function() {

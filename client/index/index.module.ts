@@ -2,10 +2,11 @@ import * as angular from 'angular';
 import IndexController from './index.controller';
 
 import './index.scss';
-const indexTemplateUrl = require('./index.html');
-const indexControllerName = 'IndexController';
 
-export default angular.module('app.index', [ 'ngRoute' ])
+const indexTemplateUrl = require('./index.html');
+const indexControllerName = 'Index';
+
+export default angular.module('app.index', ['ngRoute'])
   .controller(indexControllerName, IndexController)
   .config(config).name;
 

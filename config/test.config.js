@@ -9,9 +9,9 @@
  * all here! Crazy huh. So we need to do some setup
 */
 Error.stackTraceLimit = Infinity;
-//require('reflect-metadata');
 require('angular');
 require('angular-mocks');
+require('angular-route');
 
 /*
   Ok, this is kinda crazy. We can use the the context method on
