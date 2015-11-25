@@ -350,10 +350,11 @@ function postcss(opts) {
  * Similar to Object.assign in ES6. Needed a new function because Object.assign
  * is not working in the npm script. This does have additional features:
  *
- * - Creates new instaces of objects and arrays from the source
+ * - Creates new instances of objects and arrays from the source
  * - Does a deep clone
  * - Allows sources to be passed in either "Rest" or as an array
  *
+ * @see http://codepen.io/eneuhauser/pen/meZeEb/left/?editors=001
  */
 function assign(/*target, ...sources*/) {
   var sources = Array.prototype.slice.call(arguments, 0);
