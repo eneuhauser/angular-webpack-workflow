@@ -23,10 +23,10 @@ const Clean = require('clean-webpack-plugin');
  */
 const libraries = /(node_modules|bower_components|public)/;
 
-/**
- * Utility Libraries to help out
- */
+/* ***** HELPERS ***** */
 const entryFiles = require('../lib/entryfiles');
+const assign = require('../lib/assign');
+const isObject = require('../lib/isObject');
 
 /**
  * Function to take options to build the webpack configuration.
@@ -70,22 +70,18 @@ module.exports = function makeWebPackConfig(/* options */) {
  * @see http://webpack.github.io/docs/configuration.html#entry
  * @see https://github.com/webpack/docs/wiki/optimization#multi-page-app
  */
-function entry(opts) {
-  // Karma will set this during test build
-  if(opts.test) { return {}; }
+ function entry(opts) {
+   // Karma will set this during test build
+   if(opts.test) { return {}; }
 
-  const ext = opts.typescript ? '.ts' : '.js';
-  const files = glob.sync(opts.baseDir + '/public/*' + ext);
-  //return [ './client/styles/app.scss', './client/app' + ext ];
-  return {
-    // This is named commons for the web-dev-server
-    commons: [ './client/styles/app.scss', './client/app' + ext ],
-    // FIXME This is not ideal, but a way to copy all files in /public to /dist.
-    // Used in conjunction with a file-loader to move the files. Also, all other
-    // loaders need to exclude /public files.
-    entry: files.reduce(entryFiles, {});
-  };
-}
+   const ext = opts.typescript ? '.ts' : '.js';
+   const files = glob.sync('./client/**' + ext);
+   //return [ './client/styles/app.scss', './client/app' + ext ];
+
+   // Returns an object of file entry points that Webpack will compile into
+   // different output files.  
+   return files.reduce(entryFiles, {});
+ }
 
 /** @see http://webpack.github.io/docs/configuration.html#output */
 function output(opts) {
@@ -348,47 +344,4 @@ function postcss(opts) {
     })
 
   ];
-}
-
-/* ***** HELPERS ***** */
-
-/**
- * Similar to Object.assign in ES6. Needed a new function because Object.assign
- * is not working in the npm script. This does have additional features:
- *
- * - Creates new instaces of objects and arrays from the source
- * - Does a deep clone
- * - Allows sources to be passed in either "Rest" or as an array
- *
- */
-function assign(/*target, ...sources*/) {
-  var sources = Array.prototype.slice.call(arguments, 0);
-  const target = sources.shift() || {};
-  if(sources.length === 1 && Array.isArray(sources[0])) {
-    sources = sources[0];
-  }
-  sources.forEach(function(source) {
-    if(!isObject(source)) { return true; }
-
-    Object.keys(source).forEach(function(prop) {
-      if(!source.hasOwnProperty(prop)) { return true; }
-
-      const value = source[prop];
-      if(Array.isArray(value)) {
-        target[prop] = Array.prototype.slice.call(value, 0);
-      } else if(isObject(value)) {
-        if(!isObject(target[prop])) {
-          target[prop] = {};
-        }
-        assign(target[prop], value);
-      } else {
-        target[prop] = value;
-      }
-    });
-  });
-  return target;
-}
-
-function isObject(value) {
-  return value !== null && typeof value === 'object';
 }
