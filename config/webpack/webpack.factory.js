@@ -179,20 +179,18 @@ function loaders(opts) {
     loader: 'file?name=../[path]/[name].[ext]&context=./public'
   });
 
-  if(!opts.test) {
-    /**
-    * Use style-loader in development for hot-loading.
-    * @see https://github.com/webpack/style-loader
-    */
-    loaders.push({
-      test: /\.scss$/,
-      loader: ExtractTextPlugin.extract('style-loader', [
-        'css-loader',
-        'postcss-loader',
-        'sass-loader?includePaths[]=' + path.resolve(opts.baseDir, './client/styles')
-      ].join('!'))
-    });
-  }
+  /**
+  * Use style-loader in development for hot-loading.
+  * @see https://github.com/webpack/style-loader
+  */
+  loaders.push({
+    test: /\.scss$/,
+    loader: ExtractTextPlugin.extract('style-loader', [
+      'css-loader',
+      'postcss-loader',
+      'sass-loader?includePaths[]=' + path.resolve(opts.baseDir, './client/styles')
+    ].join('!'))
+  });
 
   return loaders;
 }
