@@ -1,12 +1,12 @@
 import * as angular from 'angular';
 import 'angular-route';
 
-import home from './home/home.module';
+import index from './index/index.module';
 import example from './components/example/example.directive.ts';
 
 angular.module('app', [
   'ngRoute',
-  home,
+  index,
   example
 ]).config(config);
 
