@@ -24,6 +24,11 @@ const Clean = require('clean-webpack-plugin');
 const libraries = /(node_modules|bower_components|public)/;
 
 /**
+ * Utility Libraries to help out
+ */
+const entryFiles = require('../lib/entryfiles');
+
+/**
  * Function to take options to build the webpack configuration.
  * @param options can be expressed as either ...rest or individual arguments.
  */
@@ -70,6 +75,7 @@ function entry(opts) {
   if(opts.test) { return {}; }
 
   const ext = opts.typescript ? '.ts' : '.js';
+  const files = glob.sync(opts.baseDir + '/public/*' + ext);
   //return [ './client/styles/app.scss', './client/app' + ext ];
   return {
     // This is named commons for the web-dev-server
@@ -77,7 +83,7 @@ function entry(opts) {
     // FIXME This is not ideal, but a way to copy all files in /public to /dist.
     // Used in conjunction with a file-loader to move the files. Also, all other
     // loaders need to exclude /public files.
-    assets: glob.sync(opts.baseDir + '/public/**/*.*')
+    entry: files.reduce(entryFiles, {});
   };
 }
 
