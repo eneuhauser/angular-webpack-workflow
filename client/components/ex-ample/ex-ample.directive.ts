@@ -4,6 +4,7 @@
  */
 import * as angular from 'angular';
 import './ex-ample.scss';
+import template from './ex-ample.directive.html';
 
 export default angular.module('app.exAmple', [])
   .directive('exAmple', exAmpleDirective)
@@ -13,7 +14,7 @@ function exAmpleDirective() {
   const directive = {
     restrict: 'AE',
     scope: {},
-    templateUrl: require('./ex-ample.directive.html'),
+    templateUrl: template,
     controllerAs: 'vm',
     controller: exAmpleController
   };
