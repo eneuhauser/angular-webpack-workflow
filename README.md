@@ -58,3 +58,9 @@ $ tsd install [package] --save
 To see how to structure an Angular 1.x application using this workflow, please check [this demo](https://github.com/Foxandxss/GermanWords-ng1-webpack).
 
 Also, there is an article in [angular-tips](http://angular-tips.com/blog/2015/06/using-angular-1-dot-x-with-es6-and-webpack/)
+
+## TODO
+
+* Jade
+* Work with AEM
+
