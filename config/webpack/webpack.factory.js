@@ -354,7 +354,7 @@ function postcss(opts) {
  * - Does a deep clone
  * - Allows sources to be passed in either "Rest" or as an array
  *
- * @see http://codepen.io/eneuhauser/pen/meZeEb/left/?editors=001
+ * @see http://codepen.io/eneuhauser/pen/wMvBGG/left/?editors=001
  */
 function assign(/*target, ...sources*/) {
   var sources = Array.prototype.slice.call(arguments, 0);
