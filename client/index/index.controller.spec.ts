@@ -12,7 +12,7 @@ describe('index.controller', function() {
     });
   }));
 
-  it('can run', function() {
+  it('can test controllers', function() {
     expect(ctrl.name).toBe('World');
   });
 

@@ -11,7 +11,7 @@ export default angular.module('app.index', ['ngRoute'])
   .config(config).name;
 
 /* @ngInject */
-function config($routeProvider) {
+function config($routeProvider, $httpProvider) {
   $routeProvider.when('/', {
     templateUrl: indexTemplateUrl,
     controller: indexControllerName,

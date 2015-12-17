@@ -3,10 +3,14 @@
  * words. This will prevent collisions with new tags that get added to HTML.
  */
 import * as angular from 'angular';
+//import Factory from './ex-ample.factory';
+import Service from './ex-ample.service';
+
 import './ex-ample.scss';
 
 export default angular.module('app.exAmple', [])
   .directive('exAmple', exAmpleDirective)
+  .service('exAmpleService', Service)
   .name;
 
 function exAmpleDirective() {
@@ -21,8 +25,13 @@ function exAmpleDirective() {
   return directive;
 }
 
-function exAmpleController() {
+// @ngInject
+function exAmpleController(exAmpleService) {
   const vm = this;
 
-  vm.title = 'Sample Directive';
+  exAmpleService.retrieveOrigin().then(function(origin) {
+    vm.title = `Your IP is ${origin}`;
+  }, function() {
+    vm.title = 'Unable to get your IP';
+  });
 }
